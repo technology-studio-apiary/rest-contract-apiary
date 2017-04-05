@@ -1,0 +1,241 @@
+FORMAT: 1A
+HOST: http://restapicontract.apiblueprint.org/
+
+# Rest Contract
+
+Contract for rest services
+
+# Request
+
+All requests should contain platform and version headers
+
+
+# Data structures
+
+## Header platform (enum)
+
+- ios
+- android
+- windows-phone
+
+## Response status (enum)
+
+- ok
+- error
+
+## Paging (object)
+
+- previous (string, optional) - endpoint that will return the previous page of data. If not included, this is the first page of data.
+- next (string, optional) - endpoint that will return the next page of data. If not included, this is the last page of data.
+- last (string, optional) - DO NOT INTRODUCE when it isn't needed, it forces to evaluate full query
+- first (string, optional) - DO NOT INTRODUCE when it isn't needed, it forces to evaluate full query
+- items_count - DO NOT INTRODUCE when it isn't needed, it forces to evaluate full query.
+
+## Response (object)
+
+- status (Response status, required)
+- code (number, required)
+- message (string, required)
+- paging (Paging, optional)
+- data (object, optional)
+
+## End of life response (Response)
+
+- status: error (string, required)
+- code: 4031 (number, required)
+- messsage: Resource is forbidden for given application version (string, required)
+
+# Operations
+
+## Group Response types
+
+### Generic request [GET /sample/generic]
+
+All requests should contain following attributes
+
++ Request 
+
+    + Headers
+            
+            X-Platform: ios
+            X-Platform-Version: 10.05.1
+            X-Application-Version: 1.0.0 
+            
++ Response 200 (application/json)
+
+
+
+### Success response [GET /sample/success]
+
++ Response 200 (application/json)
+
+    + Attributes (Response)
+    
+    + Body
+            
+            {
+                "status": "ok",
+                "code": 200,
+                "message": "Successful"
+            }
+  
+### Success response with data [GET /sample/success-with-data]
+
++ Response 200 (application/json)
+
+    + Attributes (Response)
+    
+    + Body
+          
+            {
+                "status": "ok",
+                "code": 200,
+                "message": "Successful",
+                "data": {
+                    "attribute1": 1,
+                    "attribute2": "sample"
+                    "attribute3": {
+                        "attribute4": 1
+                    },
+                    "attribute5": [
+                        1, 2, 3
+                    ]
+                }
+            }
+          
+
+### Error response [GET /sample/error]
+
+
++ Response 401 (application/json)
+
+    + Attributes (Response)
+    
+    + Body
+                
+            {
+                "status": "error",
+                "code": 401,
+                "message": "Token expired"
+            }
+
+### Error response with validation error list [GET /sample/validation]
+
++ Response 400 (application/json)
+
+    + Attributes (Response)
+    
+    + Body
+            
+            {
+                "status": "error",
+                "code": 400,
+                "message": "Invalid paramaters",
+                "data": {
+                    "validation_errors": {
+                        "email_address": ["invalid-email-format"],
+                        "phone_number": ["invalid-phone-number-format"]
+                    }
+                }
+            }
+    
+## Group Paging 
+
+### Offset based paging [GET /sample/list?{offset,limit}]
+
++ Parameters 
+
+    - offset (number, required) - This offsets the start of each page by the number specified. Inclusive.
+    - limit (number, optional) - This is the number of individual objects that are returned in each page. Note that this is an upper limit. If there are not enough objects remaining in the list of data, then fewer will be returned. 
+
++ Response 200 (application/json)
+
+    + Attributes (Response)
+    
+    + Body
+            
+            {
+                "status": "ok",
+                "code": 200,
+                "message": "Successful",
+                "paging": {
+                    "previous": "/sample/list?offset=5&limit=5",
+                    "next": "/sample/list?offset=15&limit=5"
+                },
+                "data": [10,11,12,13,14]
+            }
+
+
+### Cursor based paging [GET /sample/list?{after,before,limit}]
+
++ Parameters 
+
+    - before (optional) - This is the cursor that points to the start of the page of data that has been returned. Inclusive.
+    - after (optional) - This is the cursor that points to the end of the page of data that has been returned. Inclusive.
+    - limit (number, optional) - This is the number of individual objects that are returned in each page. Note that this is an upper limit. If there are not enough objects remaining in the list of data, then fewer will be returned. 
+
++ Response 200 (application/json)
+
+    + Attributes (Response)
+    
+    + Body
+            
+            {
+                "status": "ok",
+                "code": 200,
+                "message": "Successful",
+                "paging": {
+                    "previous": "/sample/list?after=5&limit=5",
+                    "next": "/sample/list?after=15&limit=5"
+                },
+                "data": [10,11,12,13,14]
+            }
+
+### Time based paging [GET /sample/list?{since,until,limit}]
+
++ Parameters 
+
+    - since (number, optional) - A Unix timestamp or strtotime data value that points to the end of the range of time-based data. Inclusive.
+    - until (number, optional) - A Unix timestamp or strtotime data value that points to the start of the range of time-based data. Inclusive. 
+    - limit (number, optional) - This is the number of individual objects that are returned in each page. Note that this is an upper limit. If there are not enough objects remaining in the list of data, then fewer will be returned. 
+
++ Response 200 (application/json)
+
+    + Attributes (Response)
+    
+    + Body
+            
+            {
+                "status": "ok",
+                "code": 200,
+                "message": "Successful",
+                "paging": {
+                    "previous": "/sample/list?since=1364587774&limit=5",
+                    "next": "/sample/list?since=1364849754&limit=5"
+                },
+                "data": [10,11,12,13,14]
+            }
+
+### Page based paging [GET /sample/list?{page,limit}]
+
++ Parameters 
+
+    - page (number, optional) - A number of page of data. 
+    - limit (number, optional) - This is the number of individual objects that are returned in each page. Note that this is an upper limit. If there are not enough objects remaining in the list of data, then fewer will be returned. 
+
++ Response 200 (application/json)
+
+    + Attributes (Response)
+    
+    + Body
+            
+            {
+                "status": "ok",
+                "code": 200,
+                "message": "Sucessful",
+                "paging": {
+                    "previous": "/sample/list?page=2&limit=5",
+                    "next": "/sample/list?page=3&limit=5"
+                },
+                "data": [10,11,12,13,14]
+            }
