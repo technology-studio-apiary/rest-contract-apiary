@@ -130,11 +130,33 @@ All requests should contain following attributes
             {
                 "status": "error",
                 "code": 4001,
-                "message": "Invalid paramaters",
+                "message": "Invalid parameters",
                 "data": {
                     "validation_errors": {
                         "email_address": ["invalid-email-format"],
                         "phone_number": ["invalid-phone-number-format"]
+                    }
+                }
+            }
+
+### Error response with validation error list (nested) [GET /sample/validation?nested]           
++ Response 400 (application/json)
+
+    + Attributes (Response)
+    
+    + Body
+            
+            {
+                "status": "error",
+                "code": 4001,
+                "message": "Invalid paramaters",
+                "data": {
+                    "validation_errors": {
+                        "phone_number":{
+                            "country_code": ["invalid-country-code"],
+                            "number": ["invalid-number"]
+                        },
+                        "sms_code": ["invalid-sms_code"]
                     }
                 }
             }
